@@ -1,0 +1,8 @@
+services:
+  ns3:
+    build: .
+    container_name: ns3-course
+    stdin_open: true
+    tty: true
+    volumes:
+      - ./master:/workspace/ns3-sim-2022
