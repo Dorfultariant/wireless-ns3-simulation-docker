@@ -9,6 +9,7 @@ RUN apt-get update && apt-get install -y \
     curl \
     wget \
     git \
+    vim \
     cmake \
     ninja-build \
     python3 \
@@ -16,7 +17,6 @@ RUN apt-get update && apt-get install -y \
     python3-venv \
     gcc-9 \
     g++-9 \
-    build-essential \
     libssl-dev \
     zlib1g-dev \
     libbz2-dev \

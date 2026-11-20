@@ -24,4 +24,9 @@ $ docker compose up -d
 ## Connect to the container shell
 $ docker compose exec ns3 bash
 
+
+[root#docker-container]$ . ignite.sh
+[root#docker-container]$ cd ns3-sim-2022/ 
+[root#docker-container]$ pip install -r requirements.txt
+
 ```
