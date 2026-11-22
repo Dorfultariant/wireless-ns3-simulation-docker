@@ -1,9 +1,12 @@
-FROM ubuntu:24.04
+FROM ubuntu:20.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Deps defined by the "Laboratory notes"
+#
+# Base packages
+#
 RUN apt-get update && apt-get install -y \
+    sudo \
     build-essential \
     software-properties-common \
     curl \
@@ -43,21 +46,63 @@ RUN apt-get update && apt-get install -y \
     ccache \
     doxygen \
     tcpdump \
+    make \
+    ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
+#
+# Dedicated development user
+#
+RUN groupadd ns3 && \
+    useradd -m -s /bin/bash -g ns3 ns3 && \
+    usermod -aG sudo ns3 && \
+    echo 'ns3 ALL=(ALL) NOPASSWD:ALL' > /etc/sudoers.d/ns3 && \
+    chmod 0440 /etc/sudoers.d/ns3
 
-# Setup for the specific python setup:
-ENV PYENV_ROOT=/root/.pyenv
+USER ns3
+WORKDIR /home/ns3
+
+#
+# pyenv
+#
+ENV PYENV_ROOT=/home/ns3/.pyenv
 ENV PATH=$PYENV_ROOT/bin:$PYENV_ROOT/shims:$PATH
 
 RUN curl https://pyenv.run | bash
 
-RUN bash -lc "\
-    export PATH=\$PYENV_ROOT/bin:\$PATH && \
-    eval \"\$(pyenv init -)\" && \
-    pyenv install 3.6.15 && \
-    pyenv virtualenv 3.6.15 py36env \
-"
+#
+# Python 3.6.15
+#
+RUN bash -lc '\
+    export PYENV_ROOT=/home/ns3/.pyenv && \
+    export PATH=$PYENV_ROOT/bin:$PATH && \
+    eval "$(pyenv init -)" && \
+    pyenv install -s 3.6.15 \
+'
+
+RUN bash -lc '\
+    export PYENV_ROOT=/home/ns3/.pyenv && \
+    export PATH=$PYENV_ROOT/bin:$PATH && \
+    eval "$(pyenv init -)" && \
+    pyenv virtualenv -f 3.6.15 py36env \
+'
+
+#
+# Bash configuration
+#
+COPY .bashrc /home/ns3/.bashrc
+
+COPY requirements.txt /tmp/requirements.txt
+
+RUN bash -lc '\
+    export PYENV_ROOT=/home/ns3/.pyenv && \
+    export PATH=$PYENV_ROOT/bin:$PATH && \
+    eval "$(pyenv init -)" && \
+    eval "$(pyenv virtualenv-init -)" && \
+    pyenv activate py36env && \
+    pip install --upgrade pip==21.3.1 && \
+    pip install -r /tmp/requirements.txt \
+'
 
 WORKDIR /workspace
 

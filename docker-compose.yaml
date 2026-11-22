@@ -1,10 +1,24 @@
+# services:
+#   ns3:
+#     build: .
+#     container_name: ns3-course
+#     stdin_open: true
+#     tty: true
+#     volumes:
+#       - ./master:/workspace/ns3-sim-2022
+#       - ./ignite.sh:/workspace/ignite.sh
+#       - ./requirements.txt:/workspace/ns3-sim-2022/requirements.txt
+#
 services:
   ns3:
     build: .
     container_name: ns3-course
     stdin_open: true
     tty: true
+    working_dir: /workspace
     volumes:
       - ./master:/workspace/ns3-sim-2022
       - ./ignite.sh:/workspace/ignite.sh
       - ./requirements.txt:/workspace/ns3-sim-2022/requirements.txt
+
+    command: /bin/bash
